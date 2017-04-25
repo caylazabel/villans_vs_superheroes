@@ -6,7 +6,7 @@ const dotenv = require('dotenv');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const Promise = require('bluebird'); //eslint-disable-line
-const debug = require('debug')('decor8:server');
+const debug = require('debug')('villans_vs_superheroes:server');
 
 
 //require all the files in as we make them //
