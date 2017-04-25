@@ -2,7 +2,7 @@
 
 const mongoose = require('mongoose');
 const createError = require('http-errors');
-const debug = require('debug')('decor8:category');
+const debug = require('debug')('villans_vs_superheroes:category');
 const Schema = mongoose.Schema;
 
 const Character = require('./character.js');
