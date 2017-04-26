@@ -20,3 +20,38 @@ categoryRouter.post('/api/category', bearerAuth, jsonParser, function(req, res, 
   .then(category => res.json(category))
   .catch(next);
 });
+
+categoryRouter.get('/api/category', bearerAuth, function(req, res, next) {
+  debug('Get /api/category');
+
+  Category.find({})
+  .populate('posts')
+  .then(category => res.json(category))
+  .catch(next);
+});
+
+categoryRouter.get('/api/category/:id', bearerAuth, function(req, res, next){
+  debug('Get /api/category/:id');
+
+  Category.findById(req.params.id)
+  .populate('characters')
+  .then(category => res.json(category))
+  .catch(next);
+});
+
+categoryRouter.put('/api/category/:id',
+bearerAuth, jsonParser, function(req, res, next) {
+  debug('Get /api/category/:id');
+  if(!req.body.categoryType && !req.body.name) return next(createError(400, 'expected an update'));
+
+  Category.findByIdAndAddCharacter(req.params.id, req.body, {new: true})
+  .then(category => res.json(category))
+. catch(next);
+});
+
+categoryRouter.delete('/api/category/:id', bearerAuth, function(req, res, next){
+  debug('Delete /api/category/:id');
+  Category.findByIdAndRemoveCharacter(req.params.id)
+  .then(()=> res.sendStatus(204))
+  .catch(next);
+});
