@@ -51,6 +51,18 @@ profileRouter.post('/api/profile', bearerAuth, upload.single('image'), jsonParse
   };
 
   s3UploadProm(params)
-  .then( )
-
-})
+  .then( s3data => {
+    del([`${dataDir}/*`]);
+    let imageData = {
+      name: req.body.name,
+      bio: req.body.bio,
+      created: req.body.created,
+      userID: req.user._id,
+      imageURI: s3data.Location,
+      objectKey: s3data.Key
+    };
+    return new Profile(imageData).save();
+  })
+  .then (profile => res.json(profile))
+  .catch( err => next(err));
+});
