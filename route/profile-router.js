@@ -37,6 +37,20 @@ profileRouter.post('/api/profile', bearerAuth, upload.single('image'), jsonParse
   if(!req.file) {
     return next(createError(400, 'file not saved'));
   }
+  if(!req.file.path) {
+    return next(createError(500, 'file not saved'));
+  }
 
-  
+  let ext = path.extname(req.file.originalname);
+
+  let params = {
+    ACL: 'public-read',
+    Bucket: process.env.AWS_BUCKET,
+    Key: `${req.file.filename}${ext}`,
+    Body: fs.createReadStream(req.file.path)
+  };
+
+  s3UploadProm(params)
+  .then( )
+
 })
