@@ -27,12 +27,12 @@ const exampleUser = {
 
 const exampleCategory = {
   categoryType: 'test categoryTypre',
-  desc: 'test category description'
+  story: 'test category story'
 };
 
 const exampleCharacter = {
   name: 'example character name',
-  desc: 'example character desc',
+  story: 'example character story',
   price: 4,
   image: `${__dirname}/data/tester.png`,
 };
@@ -94,7 +94,7 @@ describe('Character Routes', function() {
           Authorization: `Bearer ${this.tempToken}`
         })
         .field('name', exampleCharacter.name)
-        .field('desc', exampleCharacter.desc)
+        .field('story', exampleCharacter.story)
         .field('price', exampleCharacter.price)
         .attach('image', exampleCharacter.image)
         .end((err, res) => {
@@ -106,7 +106,7 @@ describe('Character Routes', function() {
           if (err) return done(err);
           expect(res.status).to.equal(200);
           expect(res.body.name).to.equal(exampleCharacter.name);
-          expect(res.body.desc).to.equal(exampleCharacter.desc);
+          expect(res.body.story).to.equal(exampleCharacter.story);
           expect(res.body.categoryID).to.equal(this.tempCategory._id.toString());
           expect(res.body.imageURI).to.equal(awsMocks.uploadMock.Location);
           done();
@@ -220,7 +220,7 @@ describe('Character Routes', function() {
         if(err) return done(err);
         expect(res.status).to.equal(200);
         expect(res.body.name).to.equal(exampleCharacter.name);
-        expect(res.body.desc).to.equal(exampleCharacter.desc);
+        expect(res.body.story).to.equal(exampleCharacter.story);
         expect(res.body.categoryID).to.equal(this.tempCategory._id.toString());
         expect(res.body.imageURI).to.equal('stuff');
         expect(res.body.userID).to.be.a('String');
@@ -289,8 +289,8 @@ describe('Character Routes', function() {
     beforeEach( done => {
       new Character({
         name: 'example name 2',
-        desc: 'example desc 2',
-        price: 45,
+        story: 'example story2',
+        weakness: 'example weakness',
         userID: this.tempUser._id,
         categoryID: this.tempCategory._id,
         imageURI: 'exampleURI 2',
@@ -349,7 +349,7 @@ describe('Character Routes', function() {
       it('should return an updated Character', done => {
         request.put(`${url}/api/character/${this.tempCharacter._id}`)
         .send({ name: 'new name',
-          desc: 'new description',
+          story: 'new story',
           price: 11})
         .set({
           Authorization: `Bearer ${this.tempToken}`
@@ -358,7 +358,7 @@ describe('Character Routes', function() {
           if(err) return done(err);
           expect(res.status).to.equal(200);
           expect(res.body.name).to.equal('new name');
-          expect(res.body.desc).to.equal('new description');
+          expect(res.body.story).to.equal('new story');
           expect(res.body.price).to.equal(11);
           done();
         });
@@ -383,7 +383,7 @@ describe('Character Routes', function() {
         .set({
           Authorization: `Bearer ${this.tempToken}`
         })
-        .send({name: 'no dice', desc: 'no luck'})
+        .send({name: 'no dice', story: 'no luck'})
         .end((err, res) => {
           expect(err.message).to.equal('Not Found');
           expect(res.status).to.equal(404);
@@ -398,7 +398,7 @@ describe('Character Routes', function() {
         .set({
           Authorization: 'Bear claws'
         })
-        .send({name: 'nope', desc:'nada', price: 1 })
+        .send({name: 'nope', story:'nada', price: 1 })
         .end((err, res) => {
           expect(err.message).to.equal('Unauthorized');
           expect(res.status).to.equal(401);
