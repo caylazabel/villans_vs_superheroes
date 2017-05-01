@@ -78,4 +78,33 @@ describe('Profile Routes', function () {
       });
     });
   });
+
+  describe('without an image', function() {
+    before(done => {
+      new User(exampleUser)
+      .generatePasswordHash(exampleUser.password)
+      .then ( user => user.save())
+      .then( user => {
+        this.tempUser = user;
+        return user.generateToken();
+      })
+      .then( token => {
+        this.tempToken = token;
+        done();
+      })
+      .catch(done);
+    });
+    it('shoudl return a profie', done => {
+      request.post(`${url}/api/profile`)
+      .set({
+        Authorization: `Bearer ${this.tempToken}`
+      })
+      .field('name', exampleProfile.name)
+      .field('bio', exampleProfile.bio)
+      .end((err, res) => {
+        expect(res.status).to.equal(400, 'upload worked');
+        done();
+      });
+    });
+  });
 });
