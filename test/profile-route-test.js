@@ -88,6 +88,23 @@ describe('Profile Routes', function () {
         this.tempUser = user;
         return user.generateToken();
       })
-    })
-  })
+      .then( token => {
+        this.tempToken = token;
+        done();
+      })
+      .catch(done);
+    });
+    it('shoudl return a profie', done => {
+      request.post(`${url}/api/profile`)
+      .set({
+        Authorization: `Bearer ${this.tempToken}`
+      })
+      .field('name', exampleProfile.name)
+      .field('bio', exampleProfile.bio)
+      .end((err, res) => {
+        expect(res.status).to.equal(400, 'upload worked');
+        done();
+      });
+    });
+  });
 });
