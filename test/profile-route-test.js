@@ -78,4 +78,16 @@ describe('Profile Routes', function () {
       });
     });
   });
+
+  describe('without an image', function() {
+    before(done => {
+      new User(exampleUser)
+      .generatePasswordHash(exampleUser.password)
+      .then ( user => user.save())
+      .then( user => {
+        this.tempUser = user;
+        return user.generateToken();
+      })
+    })
+  })
 });
