@@ -44,5 +44,38 @@ describe('Profile Routes', function () {
     .catch(done);
   });
 
-  
-})
+  describe('POST: /api/profile/', function () {
+    before(done => {
+      new User(exampleUser)
+      .generatePasswordHash(exampleUser.password)
+      .then( user => user.save())
+      .then( user => {
+        this.tempUser = user;
+        return user.generateToken();
+      })
+      .then( token => {
+        this.tempToken = token;
+        done();
+      })
+      .catch(done);
+    });
+    it('should return a profile', done => {
+      request.post(`${url}/api/profile`)
+      .set({
+        Authorization: `Bearer ${this.tempToken}`
+      })
+      .field('name', exampleProfile.name)
+      .field('bio', exampleProfile.bio)
+      .attatch('image', exampleProfile.image)
+      .end((err, res) => {
+        if(err) return done(err);
+        expect(res.status).to.equal(200, 'upload worked');
+        expect(res.body.name).to.equal(exampleProfile.name);
+        expect(res.body.bio).to.equal(exampleProfile.bio);
+        expect(res.body.userID).to.be.a('string');
+        expect(res.body.imageURI).to.equal(awsMocks.uploadMock.Location);
+        done();
+      });
+    });
+  });
+});
