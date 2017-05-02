@@ -182,6 +182,74 @@ describe('Profile Routes', function () {
       });
     });
 
+    describe('with an invalid id', function () {
+      before(done => {
+        new Profile(exampleProfile).save()
+        .then(profile => {
+          this.tempProfileId = profile._id;
+          done();
+        })
+        .catch(done);
+      });
+      befoer(done => {
+        new User(exampleUser)
+        .generatePasswordHash(exampleUser.password)
+        .then( user => user.save())
+        .then( user => {
+          this.tempUser = user;
+          return user.generateToken();
+        })
+        .then(token => {
+          this.tempToken = token;
+          done();
+        });
+        it('should return a 404 status', done => {
+          request.get(`${url}/api/profile/huhhh`)
+          .set({
+            Authorization: `Bearer ${this.tempToken}`
+          })
+          .end((err, res) => {
+            exprect(res.status).to.equal(404);
+            done();
+          });
+        });
+      });
+      describe('without a token', function(){
+        before(done => {
+          new User(exampleUser)
+          .generatePasswordHash(exampleUser.password)
+          .then(user => user.save())
+          .then(user => {
+            this.tempUser = user;
+            return user.generateToken();
+          })
+          .then( token => {
+            this.tempToken = token;
+            done();
+          })
+          .catch(done);
+        });
+        before(done => {
+          exampleProfile.userID = this.tempUser._id;
+          exampleProfile.imageURI = 'fake string';
+          exampleProfile.objectKey = 'fake object string';
+          new Profile(exampleProfile).save()
+          .then(profile => {
+            this.tempProfile = profile;
+            done();
+          })
+          .catch(done);
+        });
+        it('should return a profile', done => {
+          request.get(`${url}/api/profile/${this.tempProfile._id}`)
+          .end((err, res) => {
+            expect(res.status).to.equal(401);
+            done();
+          });
+        });
+      });
+    });
+
     
   });
 });
