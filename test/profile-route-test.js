@@ -191,7 +191,7 @@ describe('Profile Routes', function () {
         })
         .catch(done);
       });
-      befoer(done => {
+      before(done => {
         new User(exampleUser)
         .generatePasswordHash(exampleUser.password)
         .then( user => user.save())
@@ -209,7 +209,7 @@ describe('Profile Routes', function () {
             Authorization: `Bearer ${this.tempToken}`
           })
           .end((err, res) => {
-            exprect(res.status).to.equal(404);
+            expect(res.status).to.equal(404);
             done();
           });
         });
@@ -250,183 +250,183 @@ describe('Profile Routes', function () {
       });
     });
     describe('PUT:/api/profile/:id', function () {
-    describe('With a valid body, id, and token', function(){
-      before(done => {
-        new User(exampleUser)
-        .generatePasswordHash(exampleUser.password)
-        .then( user => user.save())
-        .then( user => {
-          this.tempUser = user;
-          return user.generateToken();
-        })
-        .then( token => {
-          this.tempToken = token;
-          done();
-        })
-        .catch(done);
+      describe('With a valid body, id, and token', function(){
+        before(done => {
+          new User(exampleUser)
+          .generatePasswordHash(exampleUser.password)
+          .then( user => user.save())
+          .then( user => {
+            this.tempUser = user;
+            return user.generateToken();
+          })
+          .then( token => {
+            this.tempToken = token;
+            done();
+          })
+          .catch(done);
+        });
+        before(done => {
+          new Profile(exampleProfile).save()
+          .then(profile => {
+            this.tempProfileId = profile._id;
+            done();
+          })
+          .catch(done);
+        });
+        it('should return an updated profile', done => {
+          request.put(`${url}/api/profile/${this.tempProfileId}`)
+          .send({name: 'new name', bio: 'new bio'})
+          .set({
+            Authorization: `Bearer ${this.tempToken}`
+          })
+          .end((err, res) => {
+            if(err) return done(err);
+            expect(res.status).to.equal(200);
+            expect(res.body.name).to.equal('new name');
+            expect(res.body.bio).to.equal('new bio');
+            done();
+          });
+        });
       });
-      before(done => {
-        new Profile(exampleProfile).save()
-        .then(profile => {
-          this.tempProfileId = profile._id;
-          done();
-        })
-        .catch(done);
+      describe('with an invalid body', function(){
+        before(done => {
+          new Profile(exampleProfile).save()
+          .then(profile => {
+            this.tempProfileId = profile._id;
+            done();
+          })
+          .catch(done);
+        });
+        before(done => {
+          new User(exampleUser)
+          .generatePasswordHash(exampleUser.password)
+          .then( user => user.save())
+          .then( user => {
+            this.tempUser = user;
+            return user.generateToken();
+          })
+          .then( token => {
+            this.tempToken = token;
+            done();
+          })
+          .catch(done);
+        });
+        it('should return an updated Profile', done => {
+          request.put(`${url}/api/profile/${this.temtempProfileId}`)
+          .set({
+            Authorization: `Bearer ${this.tempToken}`
+          })
+          .end((err, res) => {
+            expect(res.status).to.equal(400);
+            done();
+          });
+        });
       });
-      it('should return an updated profile', done => {
-        request.put(`${url}/api/profile/${this.tempProfileId}`)
-        .send({name: 'new name', bio: 'new bio'})
-        .set({
-          Authorization: `Bearer ${this.tempToken}`
-        })
-        .end((err, res) => {
-          if(err) return done(err);
-          expect(res.status).to.equal(200);
-          expect(res.body.name).to.equal('new name');
-          expect(res.body.bio).to.equal('new bio');
-          done();
+      describe('with a valid body, invalid id, and token', function(){
+        before(done => {
+          new User(exampleUser)
+          .generatePasswordHash(exampleUser.password)
+          .then( user => user.save())
+          .then( user => {
+            this.tempUser = user;
+            return user.generateToken();
+          })
+          .then( token => {
+            this.tempToken = token;
+            done();
+          })
+          .catch(done);
+        });
+        before(done => {
+          new Profile(exampleProfile).save()
+          .then(profile => {
+            this.tempProfileId = profile._id;
+            done();
+          })
+          .catch(done);
+        });
+        it('should return an updated profile', done => {
+          request.put(`${url}/api/profile/badid`)
+          .send({name: 'new name', bio: 'new bio'})
+          .set({
+            Authorization: `Bearer ${this.tempToken}`
+          })
+          .end((err, res) => {
+            expect(res.status).to.equal(404);
+            done();
+          });
+        });
+      });
+      describe('With a valid body, valid id, and invalid token', function(){
+        before(done => {
+          new Profile(exampleProfile).save()
+          .then(profile => {
+            this.tempProfileId = profile._id;
+            done();
+          })
+          .catch(done);
+        });
+        before(done => {
+          new User(exampleUser)
+          .generatePasswordHash(exampleUser.password)
+          .then(user => user.save())
+          .then(user => {
+            this.tempUser = user;
+            return user.generateToken();
+          })
+          .then(token => {
+            this.tempToken = token;
+            done();
+          })
+          .catch(done);
+        });
+        it('should return an updated Profile', done => {
+          request.put(`${url}/api/profile/${this.tempProfileId}`)
+          .send({name: 'new name', bio: 'new bio'})
+          .end((err, res) => {
+            expect(res.status).to.equal(401);
+            done();
+          });
         });
       });
     });
-    describe('with an invalid body', function(){
-      before(done => {
-        new Profile(exampleProfile).save()
-        .then(profile => {
-          this.tempProfileId = profile._id;
-          done();
-        })
-        .catch(done);
-      });
-      before(done => {
-        new User(exampleUser)
-        .generatePasswordHash(exampleUser.password)
-        .then( user => user.save())
-        .then( user => {
-          this.tempUser = user;
-          return user.generateToken();
-        })
-        .then( token => {
-          this.tempToken = token;
-          done();
-        })
-        .catch(done);
-      });
-      it('should return an updated Profile', done => {
-        request.put(`${url}/api/profile/${this.temtempProfileId}`)
-        .set({
-          Authorization: `Bearer ${this.tempToken}`
-        })
-        .end((err, res) => {
-          expect(res.status).to.equal(400);
-          done();
-        });
-      });
-    });
-    describe('with a valid body, invalid id, and token', function(){
-      before(done => {
-        new User(exampleUser)
-        .generatePasswordHash(exampleUser.password)
-        .then( user => user.save())
-        .then( user => {
-          this.tempUser = user;
-          return user.generateToken();
-        })
-        .then( token => {
-          this.tempToken = token;
-          done();
-        })
-        .catch(done);
-      });
-      before(done => {
-        new Profile(exampleProfile).save()
-        .then(profile => {
-          this.tempProfileId = profile._id;
-          done();
-        })
-        .catch(done);
-      });
-      it('should return an updated profile', done => {
-        request.put(`${url}/api/profile/badid`)
-        .send({name: 'new name', bio: 'new bio'})
-        .set({
-          Authorization: `Bearer ${this.tempToken}`
-        })
-        .end((err, res) => {
-          expect(res.status).to.equal(404);
-          done();
-        });
-      });
-    });
-    describe('With a valid body, valid id, and invalid token', function(){
-      before(done => {
-        new Profile(exampleProfile).save()
-        .then(profile => {
-          this.tempProfileId = profile._id;
-          done();
-        })
-        .catch(done);
-      });
-      before(done => {
-        new User(exampleUser)
-        .generatePasswordHash(exampleUser.password)
-        .then(user => user.save())
-        .then(user => {
-          this.tempUser = user;
-          return user.generateToken();
-        })
-        .then(token => {
-          this.tempToken = token;
-          done();
-        })
-        .catch(done);
-      });
-      it('should return an updated Profile', done => {
-        request.put(`${url}/api/profile/${this.tempProfileId}`)
-        .send({name: 'new name', bio: 'new bio'})
-        .end((err, res) => {
-          expect(res.status).to.equal(401);
-          done();
-        });
-      });
-    });
-  });
 
-  describe('DELETE: /api/profile/:id', function(){
-    describe('With a valid id', function(){
-      before(done => {
-        new Profile(exampleProfile).save()
-        .then(profile => {
-          this.tempProfile = profile;
-          done();
-        })
-        .catch(done);
-      });
-      before(done => {
-        new User(exampleUser)
-        .generatePasswordHash(exampleUser.password)
-        .then(user => user.save())
-        .then(user => {
-          this.tempUser = user;
-          return user.generateToken();
-        })
-        .then(token => {
-          this.tempToken = token;
-          done();
-        })
-        .catch(done);
-      });
-      it('should return a 204', done => {
-        request.delete(`${url}/api/profile/${this.tempProfile._id}`)
-        .set({
-          Authorization: `Bearer ${this.tempToken}`
-        })
-        .end((err, res) => {
-          if(err) return done(err);
-          expect(res.status).to.equal(204);
-          done();
+    describe('DELETE: /api/profile/:id', function(){
+      describe('With a valid id', function(){
+        before(done => {
+          new Profile(exampleProfile).save()
+          .then(profile => {
+            this.tempProfile = profile;
+            done();
+          })
+          .catch(done);
+        });
+        before(done => {
+          new User(exampleUser)
+          .generatePasswordHash(exampleUser.password)
+          .then(user => user.save())
+          .then(user => {
+            this.tempUser = user;
+            return user.generateToken();
+          })
+          .then(token => {
+            this.tempToken = token;
+            done();
+          })
+          .catch(done);
+        });
+        it('should return a 204', done => {
+          request.delete(`${url}/api/profile/${this.tempProfile._id}`)
+          .set({
+            Authorization: `Bearer ${this.tempToken}`
+          })
+          .end((err, res) => {
+            if(err) return done(err);
+            expect(res.status).to.equal(204);
+            done();
+          });
         });
       });
     });
-  });
   });
 });
