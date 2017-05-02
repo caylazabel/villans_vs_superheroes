@@ -107,4 +107,19 @@ describe('Profile Routes', function () {
       });
     });
   });
+  describe('with a wrong image file path', function() {
+    before(done => {
+      new User(exampleUser)
+      .generatePasswordHash(exampleUser.password)
+      .then( user => user.save())
+      .then( user => {
+        this.tempUser = user;
+        return user.generateToken();
+      })
+      .then( token => {
+        this.tempToken = token;
+        done();
+      })
+    })
+  })
 });
