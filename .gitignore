@@ -1,5 +1,8 @@
 # Created by https://www.gitignore.io/api/node,vim,osx,macos,linux
 
+
+.env
+
 *node_modules
 
 #ignore data files
