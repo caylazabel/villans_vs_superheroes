@@ -136,4 +136,52 @@ describe('Profile Routes', function () {
       });
     });
   });
+
+  describe('GET: /api/profile/:id', function(){
+    describe('with a valid id', function(){
+      before(done => {
+        new User(exampleUser)
+        .generatePasswordHash(exampleUser.password)
+        .then( user => user.save())
+        .then( user => {
+          this.tempUser = user;
+          return user.generateToken();
+        })
+        .then(token => {
+          this.tempToken = token;
+          done();
+        });
+        .catch(done);
+      });
+      before(done => {
+        exampleProfile.userID = this.tempUser._id;
+        exampleProfile.imageURI = 'fake string';
+        exampleProfile.objectKey = 'fake object key string';
+        new Profile (exampleProfile).save()
+        .then(profile => {
+          this.tempProfile = profile;
+          done();
+        })
+        .catch(done);
+      });
+      it('should return a profile', done => {
+        request.get(`${url}/api/profile/${this.tempProfile._id}`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .end((err, res) => {
+          if(err) return done(err);
+          let date = new Date(res.body.created).toString();
+          expect(res.status).to.equal(200);
+          expect(res.body.name).to.equal('example name');
+          expect(res.body.bio).to.equal('example bio');
+          expect(res.body.userID).to.be.a('string');
+          expect(date).to.not.equal('Invalid Date');
+          done();
+        });
+      });
+    });
+
+    
+  });
 });
