@@ -120,6 +120,20 @@ describe('Profile Routes', function () {
         this.tempToken = token;
         done();
       })
-    })
-  })
+      .catch(done);
+    });
+    it('should return a profile', done => {
+      request.post(`${url}/api/profile`)
+      .set({
+        Authorization: `Bearer ${this.tempToken}`
+      })
+      .field('name', exampleProfile.name)
+      .field('bio', exampleProfile.bio)
+      .attatch('wrongImage', exampleProfile.image)
+      .end((err, res) => {
+        expect(res.status).to.equal(500, 'upload worked');
+        done();
+      });
+    });
+  });
 });
